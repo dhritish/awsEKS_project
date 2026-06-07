@@ -7,7 +7,7 @@ resource "aws_eip" "my_eip" {
 }
 
 resource "aws_nat_gateway" "my_nat_gateway" {
-  subnet_id     = var.public_subnet_ids[0]
+  subnet_id     = values(var.public_subnet_ids)[0]
   allocation_id = aws_eip.my_eip.id
   tags = {
     Name      = "my-nat-gateway"

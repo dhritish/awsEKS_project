@@ -37,3 +37,19 @@ output "my_public_route_table_id" {
 output "my_private_route_table_id" {
   value = module.route.private_route_table
 }
+
+output "my_eks_cluster_role_arn" {
+  value = module.iam.eks_cluster_role_arn
+}
+
+output "my_node_group_role_arn" {
+  value = module.iam.node_group_role_arn
+}
+
+output "my-cluster_id" {
+  value = module.eks.my-cluster
+}
+
+output "my-nodes_id" {
+  value = module.eks.my-nodes
+}

@@ -22,3 +22,5 @@ crash.*.log
 
 # OS
 .DS_Store
+secrets.yaml
+secrets/

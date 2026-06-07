@@ -10,9 +10,10 @@ resource "aws_route_table" "public_route_table" {
 }
 
 resource "aws_route_table_association" "public_route_table_association" {
-  for_each       = toset(var.public_subnet_ids)
-  subnet_id      = each.key
+  for_each       = var.public_subnet_ids
+  subnet_id      = each.value
   route_table_id = aws_route_table.public_route_table.id
+  depends_on     = [aws_route_table.public_route_table]
 }
 
 resource "aws_route_table" "private_route_table" {
@@ -27,7 +28,8 @@ resource "aws_route_table" "private_route_table" {
 }
 
 resource "aws_route_table_association" "private_route_table_association" {
-  for_each       = toset(var.private_subnet_ids)
-  subnet_id      = each.key
+  for_each       = var.private_subnet_ids
+  subnet_id      = each.value
   route_table_id = aws_route_table.private_route_table.id
+  depends_on     = [aws_route_table.private_route_table]
 }

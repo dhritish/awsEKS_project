@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-config
+
+data:
+  RAZORPAY_KEY_ID: "rzp_test_S1OkjxedphIauo"
+  FIREBASE_SERVICE_ACCOUNT_PATH: "/app/secrets/inventory-firebase-adminsdk.json"
+  SALT_ROUND: "10"
+  SMTP_HOST: "smtp.gmail.com"
+  SMTP_PORT: "465"
+  F_URL: "http://localhost:5173"
+  REDIS_HOST: "redis-0.redis"
+  REDIS_PORT: "6379"

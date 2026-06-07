@@ -9,8 +9,10 @@ resource "aws_subnet" "public_subnet" {
   availability_zone       = each.key
   map_public_ip_on_launch = true
   tags = {
-    Name      = "public-subnet-${each.key}"
-    Terraform = "true"
+    Name                               = "public-subnet-${each.key}"
+    Terraform                          = "true"
+    "kubernetes.io/role/elb"           = "1"
+    "kubernetes.io/cluster/my-cluster" = "shared"
   }
 }
 
@@ -25,7 +27,9 @@ resource "aws_subnet" "private_subnet" {
   availability_zone       = each.key
   map_public_ip_on_launch = false
   tags = {
-    Name      = "private-subnet-${each.key}"
-    Terraform = "true"
+    Name                               = "private-subnet-${each.key}"
+    Terraform                          = "true"
+    "kubernetes.io/role/internal-elb"  = "1" # private
+    "kubernetes.io/cluster/my-cluster" = "shared"
   }
 }

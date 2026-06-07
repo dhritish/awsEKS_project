@@ -37,3 +37,64 @@ module "route" {
   igw_id             = module.igw.igw_id
   nat_gateway_id     = module.nat.my_nat_gateway_id
 }
+
+module "iam" {
+  source = "./modules/iam"
+}
+
+module "eks" {
+  source               = "./modules/eks"
+  private_subnet_ids   = module.subnets.private_subnet_ids
+  eks_cluster_role_arn = module.iam.eks_cluster_role_arn
+  node_group_role_arn  = module.iam.node_group_role_arn
+}
+
+data "aws_eks_cluster_auth" "token" {
+  name = module.eks.my-cluster-name
+}
+
+provider "kubernetes" {
+  host                   = module.eks.endpoint
+  cluster_ca_certificate = base64decode(module.eks.certificate)
+  token                  = data.aws_eks_cluster_auth.token.token
+
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    command     = "aws"
+    args = [
+      "eks",
+      "get-token",
+      "--cluster-name",
+      module.eks.my-cluster-name
+    ]
+  }
+}
+
+provider "helm" {
+  kubernetes = {
+    host                   = module.eks.endpoint
+    cluster_ca_certificate = base64decode(module.eks.certificate)
+    token                  = data.aws_eks_cluster_auth.token.token
+
+    exec = {
+      api_version = "client.authentication.k8s.io/v1beta1"
+      command     = "aws"
+      args = [
+        "eks",
+        "get-token",
+        "--cluster-name",
+        module.eks.my-cluster-name
+      ]
+    }
+  }
+}
+
+module "cas" {
+  source              = "./modules/cas"
+  my-cluster_identity = module.eks.url
+  my-cluster-name     = module.eks.my-cluster-name
+
+  providers = {
+    helm = helm
+  }
+}

@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+
+spec:
+  serviceName: redis
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: redis
+
+  template:
+    metadata:
+      labels:
+        app: redis
+
+    spec:
+      containers:
+        - name: redis
+          image: redis:7
+
+          command:
+            - redis-server
+            - /usr/local/etc/redis/redis.conf
+
+          ports:
+            - containerPort: 6379
+
+          startupProbe:
+            tcpSocket:
+              port: 6379
+            failureThreshold: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+            initialDelaySeconds: 10
+
+          livenessProbe:
+            tcpSocket:
+              port: 6379
+            periodSeconds: 10
+            initialDelaySeconds: 10
+            timeoutSeconds: 1
+            failureThreshold: 3
+            successThreshold: 1
+
+          readinessProbe:
+            tcpSocket:
+              port: 6379
+            periodSeconds: 5
+            initialDelaySeconds: 5
+            timeoutSeconds: 1
+            failureThreshold: 3
+            successThreshold: 1
+
+          volumeMounts:
+            - name: redis-config
+              mountPath: /usr/local/etc/redis
+
+            - name: redis-storage
+              mountPath: /data
+
+      volumes:
+        - name: redis-config
+          configMap:
+            name: redis-config
+
+  volumeClaimTemplates:
+    - metadata:
+        name: redis-storage
+
+      spec:
+        accessModes:
+          - ReadWriteOnce
+
+        storageClassName: gp3
+
+        resources:
+          requests:
+            storage: 1Gi
